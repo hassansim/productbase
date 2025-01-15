@@ -20,7 +20,9 @@ import {
 	useToast,
 	VStack,
 } from "@chakra-ui/react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useProductStore } from "../store/product";
+import { useFavoritesStore } from "../store/favorites";
 import { useState } from "react";
 
 const ProductCard = ({ product }) => {
@@ -30,6 +32,9 @@ const ProductCard = ({ product }) => {
 	const bg = useColorModeValue("white", "gray.800");
 
 	const { deleteProduct, updateProduct } = useProductStore();
+	const { isFavorite, toggleFavorite } = useFavoritesStore();
+	const isFav = isFavorite(product._id);
+
 	const toast = useToast();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -97,11 +102,19 @@ const ProductCard = ({ product }) => {
 				</Text>
 
 				<HStack spacing={2}>
-					<IconButton icon={<EditIcon />} onClick={onOpen} colorScheme='blue' />
+					<IconButton icon={<EditIcon />} onClick={onOpen} colorScheme='blue' aria-label='Edit product' />
 					<IconButton
 						icon={<DeleteIcon />}
 						onClick={() => handleDeleteProduct(product._id)}
 						colorScheme='red'
+						aria-label='Delete product'
+					/>
+					<IconButton
+						icon={isFav ? <FaHeart color='#E53E3E' /> : <FaRegHeart />}
+						onClick={() => toggleFavorite(product._id)}
+						variant='outline'
+						colorScheme={isFav ? "red" : "gray"}
+						aria-label='Toggle favorite'
 					/>
 				</HStack>
 			</Box>
