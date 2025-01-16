@@ -1,5 +1,11 @@
-﻿import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
+	AlertDialog,
+	AlertDialogBody,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogContent,
+	AlertDialogOverlay,
 	Box,
 	Button,
 	Heading,
@@ -23,7 +29,7 @@ import {
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useProductStore } from "../store/product";
 import { useFavoritesStore } from "../store/favorites";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const ProductCard = ({ product }) => {
 	const [updatedProduct, setUpdatedProduct] = useState(product);
@@ -37,8 +43,15 @@ const ProductCard = ({ product }) => {
 
 	const toast = useToast();
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const {
+		isOpen: isDeleteOpen,
+		onOpen: onOpenDelete,
+		onClose: onCloseDelete,
+	} = useDisclosure();
+	const cancelDeleteRef = useRef();
 
 	const handleDeleteProduct = async (pid) => {
+		onCloseDelete();
 		const { success, message } = await deleteProduct(pid);
 		if (!success) {
 			toast({
@@ -105,7 +118,7 @@ const ProductCard = ({ product }) => {
 					<IconButton icon={<EditIcon />} onClick={onOpen} colorScheme='blue' aria-label='Edit product' />
 					<IconButton
 						icon={<DeleteIcon />}
-						onClick={() => handleDeleteProduct(product._id)}
+						onClick={onOpenDelete}
 						colorScheme='red'
 						aria-label='Delete product'
 					/>
@@ -119,6 +132,7 @@ const ProductCard = ({ product }) => {
 				</HStack>
 			</Box>
 
+			{/* Edit Product Modal */}
 			<Modal isOpen={isOpen} onClose={onClose}>
 				<ModalOverlay />
 
@@ -163,6 +177,34 @@ const ProductCard = ({ product }) => {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
+
+			{/* Delete Confirmation Alert Dialog */}
+			<AlertDialog
+				isOpen={isDeleteOpen}
+				leastDestructiveRef={cancelDeleteRef}
+				onClose={onCloseDelete}
+			>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						<AlertDialogHeader fontSize='lg' fontWeight='bold'>
+							Delete Product
+						</AlertDialogHeader>
+
+						<AlertDialogBody>
+							Are you sure you want to delete "{product.name}"? You can't undo this action afterwards.
+						</AlertDialogBody>
+
+						<AlertDialogFooter>
+							<Button ref={cancelDeleteRef} onClick={onCloseDelete}>
+								Cancel
+							</Button>
+							<Button colorScheme='red' onClick={() => handleDeleteProduct(product._id)} ml={3}>
+								Delete
+							</Button>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
 		</Box>
 	);
 };

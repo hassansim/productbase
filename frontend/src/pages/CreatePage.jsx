@@ -1,4 +1,4 @@
-﻿import { Box, Button, Container, Heading, Input, useColorModeValue, useToast, VStack } from "@chakra-ui/react";
+import { Box, Button, Container, Heading, Image, Input, Text, useColorModeValue, useToast, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { useProductStore } from "../store/product";
 
@@ -60,6 +60,28 @@ const CreatePage = () => {
 							value={newProduct.image}
 							onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
 						/>
+
+						{/* Live Image Preview */}
+						{newProduct.image && (
+							<Box w='full' textAlign='center' pt={1}>
+								<Text fontSize='xs' color='gray.500' mb={1} fontWeight='bold'>
+									IMAGE PREVIEW
+								</Text>
+								<Image
+									src={newProduct.image}
+									alt='Product preview'
+									maxH='180px'
+									mx='auto'
+									rounded='md'
+									objectFit='cover'
+									fallback={
+										<Text fontSize='xs' color='red.400'>
+											Unable to load image from this URL
+										</Text>
+									}
+								/>
+							</Box>
+						)}
 
 						<Button colorScheme='blue' onClick={handleAddProduct} w='full'>
 							Add Product
